@@ -573,9 +573,9 @@ sync();
 strip.focus({preventScroll:true});
 </script>
 <script id="autoplay">
-/* Auto-advance every 5 s; any wheel, touch, click or key resets the timer, so manual scrolling always wins. */
+/* Auto-advance every 3 s; any wheel, touch, click or key resets the timer, so manual scrolling always wins. */
 (()=>{
-  const strip=document.getElementById("strip"),DELAY=5000;
+  const strip=document.getElementById("strip"),DELAY=3000;
   const horiz=()=>getComputedStyle(strip).overflowX!=="visible"&&strip.scrollWidth>strip.clientWidth+5;
   let t;
   const arm=()=>{clearTimeout(t);t=setTimeout(next,DELAY)};
