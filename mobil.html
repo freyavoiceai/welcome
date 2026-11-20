@@ -102,6 +102,8 @@ a{color:inherit}
 .yt{aspect-ratio:16/9;width:100%;background:#000}
 .yt iframe{width:100%;height:100%;border:0;display:block}
 .sector header h2{font-size:clamp(2.6rem,7vh,3.8rem)}
+.wall-frame header{flex:0 0 auto;border-bottom:1px solid var(--line);padding-bottom:10px}
+.wall-frame h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(2.6rem,7vh,3.8rem);line-height:1}
 .chapter.dark-ch{background:var(--void)}
 .chapter .lead-text{margin:0;color:#ead9cc;max-width:40ch;line-height:1.5}
 /* press: NTV on top, two news clippings side by side under it; frame width follows the NTV image so no empty bands */
@@ -183,7 +185,7 @@ a{color:inherit}
 .wall-groups{flex:1;min-height:0;display:flex;gap:clamp(24px,3vw,44px)}
 .wg{display:flex;flex-direction:column;gap:12px;min-height:0}
 .wg h3{margin:0;font-family:var(--f-label);font-weight:700;font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:8px}
-.wall{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-columns:clamp(180px,26vh,280px);gap:12px}
+.wall{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-columns:clamp(200px,28vh,300px);gap:14px}
 @media (max-height:640px){.wall{grid-template-rows:repeat(2,minmax(0,1fr))}}
 .wall .logo{height:100%;width:100%;padding:clamp(12px,2.4vh,26px) clamp(16px,2vw,30px);transition:transform .2s ease}
 .wall .logo:hover{transform:scale(1.04)}
@@ -510,6 +512,7 @@ const SECTOR={"Aktifbank":"banka","Yapı Kredi":"banka","Vakıfbank":"banka","De
 const SECTORS=[["banka","Bankalar"],["sigorta","Sigorta"],["diger",""]];
 const firstDate=st=>st.d||(st.cards.map(c=>c.d).sort()[0])||"";
 const renderTopic=(tp,ti)=>{
+  if(tp.tl==="Bankalar")frames.push(`<section class="frame pad chapter"><div class="txt"><div class="eyebrow">Çalıştığımız kurumlar ve partnerlerimiz</div><div class="topic">Bize güvenenler</div></div></section>`);
   if(tp.sector){
     frames.push(`<section class="frame pad month sector" data-tl="${esc(tp.tl)}"><header><h2>${esc(tp.title)}</h2></header><div class="cols">${tp.cards.slice().sort((a,b)=>a.d.localeCompare(b.d)).map(brandCard).join("")}</div></section>`);
     return;
@@ -548,16 +551,12 @@ const renderTopic=(tp,ti)=>{
 };
 TOPICS.filter(t=>t.tl!=="Ekibimiz").forEach(renderTopic);
 
+// Banks and insurers have their own sections with results; only the rest appear as logo walls
 const WALL_GROUPS=[
- ["Bankalar",["Garanti BBVA","Yapı Kredi","Vakıfbank","Aktifbank","DenizBank"]],
- ["Sigorta",["Allianz","Türkiye Sigorta","Sompo","Aksigorta","Sigortam.net","Hepiyi"]],
  ["Perakende",["Doğuş Oto","EmlakJet","ikas","Suri","Ödeal"]],
  ["Partnerler",["Hackzone","Mastercard Lighthouse","Garanti BBVA Partners"]]
 ];
-frames.push(`<section class="frame pad wall-frame">
-  <div class="eyebrow">Çalıştığımız kurumlar ve partnerlerimiz</div><h2 class="sec-title">Bize güvenenler</h2>
-  <div class="wall-groups">${WALL_GROUPS.map(([g,ws])=>`<div class="wg"><h3>${g}</h3><div class="wall">${ws.map(logo).join("")}</div></div>`).join("")}</div>
-</section>`);
+WALL_GROUPS.forEach(([g,ws])=>frames.push(`<section class="frame pad wall-frame" data-tl="${g}"><header><h2>${g}</h2></header><div class="wall">${ws.map(logo).join("")}</div></section>`));
 
 // desktop: two rows; Yunus, Harun, Yusuf, Berke start the bottom row under Tunga
 const TEAM_TOP=[0,1,2,3,4,9,11,13,15],TEAM_BOT=[5,6,7,8,10,12,14,16];
