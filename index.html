@@ -568,6 +568,30 @@ if(document.fonts)document.fonts.ready.then(relayout);
 sync();
 strip.focus({preventScroll:true});
 </script>
+<script id="autoplay">
+/* Auto-advance every 5 s; any wheel, touch, click or key resets the timer, so manual scrolling always wins. */
+(()=>{
+  const strip=document.getElementById("strip"),DELAY=5000;
+  const horiz=()=>getComputedStyle(strip).overflowX!=="visible"&&strip.scrollWidth>strip.clientWidth+5;
+  let t;
+  const arm=()=>{clearTimeout(t);t=setTimeout(next,DELAY)};
+  function next(){
+    if(document.hidden||document.querySelector(".tm.open"))return arm();
+    if(horiz()){
+      if(strip.scrollLeft+strip.clientWidth>=strip.scrollWidth-4)return;
+      typeof step==="function"?step(1):strip.scrollBy({left:strip.clientWidth*.85,behavior:"smooth"});
+    }else{
+      const y=scrollY,tops=[...strip.children].map(f=>f.getBoundingClientRect().top+scrollY);
+      const n=tops.find(v=>v>y+8);
+      if(n==null||y+innerHeight>=document.documentElement.scrollHeight-4)return;
+      scrollTo({top:Math.min(n,y+innerHeight*.9),behavior:"smooth"});
+    }
+    arm();
+  }
+  ["wheel","touchstart","pointerdown","keydown"].forEach(e=>addEventListener(e,arm,{passive:true,capture:true}));
+  arm();
+})();
+</script>
 
 </body>
 </html>
