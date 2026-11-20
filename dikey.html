@@ -258,7 +258,7 @@ a{color:inherit}
 .conf-note{font-family:var(--f-body);font-size:.7rem;letter-spacing:.02em;color:#8a827b;white-space:nowrap;font-weight:400}
 .end .fine{margin-top:auto;font-size:.72rem;line-height:1.55;color:var(--faint);max-width:52ch;border-top:1px solid var(--line);padding-top:14px}
 .end .fine b{color:var(--dim);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem}
-.end .slab.welcome{font-size:clamp(2.8rem,7vw,4.6rem);line-height:1.02;padding:.1em .22em .2em}
+.end .welcome-line{margin:10px 0 0;font-family:var(--f-display);font-size:clamp(2rem,5vh,2.8rem);line-height:1;color:var(--accent)}
 .tm{grid-row:auto!important;grid-column:auto!important}
 .wall-groups{flex-direction:column;gap:28px}
 .wg .wall{flex:none}
@@ -517,8 +517,9 @@ const TEAM=[{"n": "Tunga Bayrak", "t": "CEO & Co-Founder", "ab": "University of 
 TOPICS.filter(t=>t.tl==="Ekibimiz").forEach(renderTopic);
 frames.push(`<section class="frame pad team"><div class="team-grid">${TEAM.map((m,i)=>`<article class="tm" style="${teamPos(i)}"><div class="ph"><img src="${m.img}" alt="${esc(m.n)}" loading="lazy"></div><div class="meta"><div class="nm">${esc(m.n)}</div><div class="ttl" lang="en">${esc(m.t)}</div><div class="row"><button type="button" class="ab">Hakkında →</button>${m.li?`<a class="li" href="${m.li}" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>`:""}</div></div><div class="ov"><p>${esc(m.ab)}</p><button type="button" class="ab x">← Kapat</button></div></article>`).join("")}</div></section>`);
 frames.push(`<section class="frame pad end">
-  <p class="eyebrow" style="margin:0">Devamı gelecek</p>
-  <span class="slab welcome">ARAMIZA<br>HOŞ GELDİN</span>
+  <span class="slab">DEVAMI</span>
+  <p style="font-family:var(--f-label);font-size:1.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink)">gelecek</p>
+  <p class="welcome-line">Aramıza hoş geldin.</p>
   <p class="fine"><b>Kurum içi / Gizli.</b> Bu materyal yalnızca Freya ekibine yeni katılanlar için hazırlanmıştır ve yalnızca paylaşıldığı kişi tarafından görüntülenebilir. İçeriğin tamamının ya da bir bölümünün kopyalanması, çoğaltılması, ekran görüntüsünün alınması, iletilmesi veya üçüncü kişilerle paylaşılması yasaktır. © 2026 Freya. Tüm hakları saklıdır.</p>
 </section>`);
 
