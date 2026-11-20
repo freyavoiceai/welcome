@@ -134,8 +134,8 @@ a{color:inherit}
 .card.brand .bname{font-family:var(--f-label);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.85rem;color:var(--dim)}
 .card.brand .bm{font-family:var(--f-display);font-size:clamp(1.8rem,4.4vh,2.4rem);line-height:1;color:var(--accent)}
 /* logos */
-.logo{display:inline-flex;align-items:center;justify-content:center;background:rgba(236,231,226,.78);padding:6px 9px;border-radius:2px;flex:0 0 auto}
-.logo.dark{background:#1b2a4a}
+.logo{display:inline-flex;align-items:center;justify-content:center;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.07);padding:6px 9px;border-radius:2px;flex:0 0 auto}
+.logo.dark{background:rgba(0,0,0,.38)}
 .logo img{display:block;max-width:100%;max-height:100%;object-fit:contain}
 .card .logo{width:74px;height:34px;padding:4px 7px}
 
@@ -264,6 +264,8 @@ a{color:inherit}
 .end .cont{display:flex;flex-direction:column;gap:18px}
 .end .fine{margin-top:0!important}
 .end .welcome-line{margin:0;font-family:var(--f-display);font-size:clamp(2rem,5vh,2.8rem);line-height:1;color:var(--accent)}
+.logo:not(.keep) img{filter:brightness(0) invert(1);opacity:.92}
+.card .src{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tm{grid-row:auto!important;grid-column:auto!important}
 .wall-groups{flex-direction:column;gap:28px}
 .wg .wall{flex:none}
@@ -403,13 +405,15 @@ const LOGOS={
  "ikas":"ikas.png","Suri":"suri.png"
 };
 const DARK=new Set(["Garanti BBVA Partners"]);
+// logos that stay in colour on the dark tiles; the rest are shown in white
+const KEEP=new Set(["Mastercard Lighthouse","Suri","Garanti BBVA Partners"]);
 const WALL=["Garanti BBVA","Yapı Kredi","Vakıfbank","Aktifbank","Allianz","Türkiye Sigorta","Sompo","Aksigorta","Sigortam.net","Hepiyi","DenizBank","Doğuş Oto","Ödeal","EmlakJet","ikas","Suri","Mastercard Lighthouse"];
 const MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmtDay=d=>{const p=d.split("-");if(p.length===1)return p[0];return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:`${MONTHS[+p[1]-1]} ${p[0]}`};
 const EN=/(Mastercard Lighthouse|Voice AI Hackathon|Design Arena|Hackzone by Allianz|Hackzone|Garanti BBVA Partners|Garanti BBVA|Allianz|Sompo|Y Combinator|Freya)/g;
 const L=t=>esc(t).replace(EN,'<span lang="en">$1</span>');
-const logo=(who)=>LOGOS[who]?`<span class="logo${DARK.has(who)?" dark":""}"><img src="logos/${LOGOS[who]}" alt="${esc(who)}" loading="lazy"></span>`:"";
+const logo=(who)=>LOGOS[who]?`<span class="logo${DARK.has(who)?" dark":""}${KEEP.has(who)?" keep":""}"><img src="logos/${LOGOS[who]}" alt="${esc(who)}" loading="lazy"></span>`:"";
 
 /* ---------- BUILD STRIP ---------- */
 const frames=[];
@@ -454,7 +458,7 @@ const cardHtml=r=>`<article class="card">
       <div class="src">${esc(r.src)}</div>
     </article>`;
 const brandCard=r=>`<article class="card brand">
-      <span class="logo big">${LOGOS[r.who]?`<img src="logos/${LOGOS[r.who]}" alt="${esc(r.who)}" loading="lazy">`:esc(r.who)}</span>
+      <span class="logo big${KEEP.has(r.who)?" keep":""}">${LOGOS[r.who]?`<img src="logos/${LOGOS[r.who]}" alt="${esc(r.who)}" loading="lazy">`:esc(r.who)}</span>
       <div class="bname">${L(r.who)}</div>
       <div class="bm">${esc(r.m)}</div>
       <div class="t">${esc(r.t)}</div>
