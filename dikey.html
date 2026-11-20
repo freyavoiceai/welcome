@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<title>Welcome to Freya</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a horizontal film strip. Full-bleed YC frame -> month columns interleaved with photo frames (photo + Getty-style caption beside it) -> legends, logo wall, quotes, end card. Click right half = forward, left half = back. Bottom bar is a month timeline. */
+:root{
+  --void:#0b0a09;
+  --stage:#171412;
+  --panel:#211c18;
+  --ink:#f4efe9;
+  --dim:#a59c93;
+  --faint:#6e665f;
+  --line:#2d2723;
+  --accent:#ff6b1a;
+  --accent-deep:#5a2208;
+  --f-display:"Anton","Impact","Haettenschweiler","Arial Narrow Bold",sans-serif;
+  --f-label:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --bar:64px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;overflow:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.eyebrow{font-family:var(--f-label);font-weight:600;font-size:.95rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.slab{background:var(--accent);color:var(--void);font-family:var(--f-display);line-height:1;letter-spacing:.02em;padding:.06em .22em .04em;display:inline-block}
+
+/* ---------- STRIP ---------- */
+.strip{position:absolute;inset:0 0 calc(var(--bar) + env(safe-area-inset-bottom,0px)) 0;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain;cursor:e-resize}
+.strip.back{cursor:w-resize}
+.strip::-webkit-scrollbar{display:none}
+.frame{flex:0 0 auto;height:100%;position:relative;border-right:1px solid var(--line);margin:0}
+.frame.pad{padding-block:clamp(20px,4vh,44px);padding-inline:clamp(20px,3vw,40px);overflow:hidden}
+.frame:first-child{padding-left:max(0px,env(safe-area-inset-left,0px))}
+
+/* hero */
+.hero{width:100vw;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,10,9,.92) 0%,rgba(11,10,9,.55) 45%,rgba(11,10,9,.08) 75%),linear-gradient(0deg,rgba(11,10,9,.85),transparent 45%)}
+.hero-copy{position:absolute;z-index:2;left:max(24px,env(safe-area-inset-left,0px),4vw);right:24px;bottom:clamp(24px,6vh,64px);display:grid;gap:18px;max-width:680px}
+.hero h1{margin:0}
+.hero h1 .slab{font-size:clamp(3.6rem,12vw,8.5rem)}
+.hero p{margin:0;color:#ddd5ce;font-size:1.08rem;max-width:52ch}
+.stat{justify-self:start;border-left:3px solid var(--accent);padding:4px 0 4px 14px}
+.stat b{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,4vw,2.8rem);line-height:1;font-variant-numeric:tabular-nums}
+.stat span{display:block;font-family:var(--f-label);font-size:.95rem;color:var(--dim);margin-top:6px}
+.swipe{position:absolute;z-index:2;right:max(24px,env(safe-area-inset-right,0px));top:clamp(20px,5vh,48px);font-family:var(--f-label);font-weight:700;letter-spacing:.25em;text-transform:uppercase;font-size:.95rem;display:flex;gap:10px;align-items:center}
+.swipe i{display:inline-block;width:46px;height:2px;background:var(--accent);position:relative;animation:nudge 1.6s ease-in-out infinite}
+.swipe i::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left-color:var(--accent);border-right:0}
+@keyframes nudge{50%{transform:translateX(8px)}}
+
+/* Getty-style caption */
+.gcap{font-family:var(--f-body);font-size:.85rem;line-height:1.45;color:#d8d0c8}
+.gcap .when{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.04em;color:var(--accent);text-transform:uppercase}
+.gcap .ltr{font-family:var(--f-label);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-size:.82rem}
+.gcap .names{color:var(--ink);font-weight:600}
+.gcap .credit{font-family:var(--f-mono);font-size:.66rem;color:var(--faint)}
+.hero .gcap{position:absolute;z-index:2;right:max(24px,env(safe-area-inset-right,0px));bottom:clamp(24px,6vh,64px);max-width:300px;text-align:right;background:rgba(11,10,9,.72);padding:10px 14px;border-right:3px solid var(--accent);display:grid;gap:3px}
+@media (max-width:760px){.hero .gcap{top:clamp(64px,10vh,90px);bottom:auto}}
+
+/* chapter card */
+.chapter{width:min(78vw,320px);display:flex;flex-direction:column;justify-content:flex-end;gap:10px;background:linear-gradient(180deg,var(--void),var(--accent-deep))}
+.chapter .yr{font-family:var(--f-display);font-size:clamp(5rem,16vh,9rem);line-height:.85}
+.chapter p{margin:0;color:#ead9cc;max-width:28ch}
+.chapter .topic{font-family:var(--f-display);font-size:clamp(2.4rem,7vh,3.8rem);line-height:.95;text-wrap:balance}
+
+.chapter:has(.lead){width:min(88vw,420px)}
+.chapter .lead{display:grid;gap:12px;margin-top:14px}
+.chapter .lead .card{background:rgba(11,10,9,.55)}
+.chapter .lead h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1;text-wrap:balance}
+.chapter{flex-direction:row;align-items:stretch;gap:clamp(20px,3vw,40px)}
+.chapter .txt{display:flex;flex-direction:column;justify-content:flex-end;gap:10px;min-width:0;flex:1}
+.chapter.has-side{width:auto}
+.chapter.has-side .txt{flex:0 0 min(78vw,400px)}
+.chapter .side-img{flex:0 0 auto;display:flex;align-items:center;margin-block:calc(-1*clamp(20px,4vh,44px));margin-left:calc(-1*clamp(20px,3vw,40px))}
+.chapter .side-img img{display:block;height:100%;width:auto;max-width:42vw;object-fit:cover}
+.chapter .side-img.small{margin:0}
+.chapter .side-img.small img{height:auto;max-height:78%;max-width:34vw;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+/* caption written on the picture, like the opening frame */
+.ov{position:relative}
+.ovcap{position:absolute;z-index:2;right:max(24px,env(safe-area-inset-right,0px));bottom:clamp(24px,5vh,48px);max-width:320px;text-align:right;background:rgba(11,10,9,.72);padding:10px 14px;border-right:3px solid var(--accent);display:grid;gap:3px}
+.story .poster{height:100%;flex:0 0 auto;background:#000}
+.story .poster img{display:block;height:100%;width:auto;max-width:48vw;object-fit:contain}
+/* whole: never crop, show the full image */
+.photo.whole .pic{padding:0 clamp(12px,2vw,24px)}
+.photo.whole .pic img{height:auto;max-height:100%;width:auto;max-width:92vw;object-fit:contain}
+.lead-logo{width:100%;height:clamp(64px,10vh,96px);padding:12px 22px;justify-content:flex-start}
+.lead-logo img{max-height:100%}
+.ovcap .ovt{font-family:var(--f-display);font-weight:400;font-size:1.5rem;line-height:1.05;color:var(--ink)}
+.ovcap{max-width:380px}
+.yt-quote{font-family:var(--f-display);font-size:clamp(1.4rem,3vh,2rem);line-height:1.1;color:var(--accent);text-decoration:none;border-bottom:2px solid var(--accent);justify-self:start}
+.yt-quote:hover{color:var(--ink);border-color:var(--ink)}
+.yt{aspect-ratio:16/9;width:100%;background:#000}
+.yt iframe{width:100%;height:100%;border:0;display:block}
+.sector header h2{font-size:clamp(2.6rem,7vh,3.8rem)}
+.chapter.dark-ch{background:var(--void)}
+.chapter .lead-text{margin:0;color:#ead9cc;max-width:40ch;line-height:1.5}
+/* press: NTV on top, two news clippings side by side under it; frame width follows the NTV image so no empty bands */
+.photo.press{--A:calc(100svh - var(--bar) - env(safe-area-inset-bottom,0px));--H:calc((var(--A) - 6px)/1.31);flex-direction:column;width:calc(var(--H)*1.838);padding:0;gap:6px;background:var(--void)}
+.photo.whole.press .pic{flex:0 0 var(--H);height:var(--H);padding:0;background:#000}
+.photo.whole.press .pic img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+.photo.press .press-row{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.photo.press .press-row img{display:block;width:100%;height:100%;object-fit:contain;background:#fff}
+/* month column */
+.month{display:flex;flex-direction:column;gap:14px;background:var(--void)}
+.month .cols{flex:1;min-height:0;display:flex;gap:14px;align-items:flex-start}
+.month .col{width:min(80vw,340px);display:flex;flex-direction:column;gap:14px}
+.month header{flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.month h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:2.4rem;line-height:1}
+.month header small{font-family:var(--f-mono);font-size:.75rem;color:var(--dim)}
+.card{background:var(--stage);border-top:2px solid var(--line);padding:14px 14px 12px;display:grid;gap:8px;min-width:0}
+.card .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card .d{font-family:var(--f-mono);font-size:.74rem;color:var(--dim);font-variant-numeric:tabular-nums}
+.card .m{font-family:var(--f-display);font-size:1.6rem;line-height:1;text-align:right;color:var(--accent);font-variant-numeric:tabular-nums}
+.card .who{display:flex;align-items:center;gap:10px;font-family:var(--f-label);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.9rem;color:var(--dim)}
+.card .t{font-weight:500;line-height:1.4}
+.card .src{font-family:var(--f-mono);font-size:.68rem;color:var(--faint);word-break:break-word}
+
+/* brand card: one per company, big logo, one orange headline */
+.card.brand{gap:10px;padding:18px 18px 14px;border-top:2px solid var(--accent)}
+.card.brand .logo.big{width:100%;height:72px;padding:10px 16px;justify-content:flex-start}
+.card.brand .logo.big img{max-height:52px}
+.card.brand .bname{font-family:var(--f-label);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.85rem;color:var(--dim)}
+.card.brand .bm{font-family:var(--f-display);font-size:clamp(1.8rem,4.4vh,2.4rem);line-height:1;color:var(--accent)}
+/* logos */
+.logo{display:inline-flex;align-items:center;justify-content:center;background:#fff;padding:6px 9px;border-radius:2px;flex:0 0 auto}
+.logo.dark{background:#1b2a4a}
+.logo img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+.card .logo{width:74px;height:34px;padding:4px 7px}
+
+/* photo frame: picture with caption column beside it */
+/* story: title + cards (+ caption of its photo) on the left, the photo right next to it */
+.story{display:flex;background:var(--void)}
+.story .panel{flex:0 0 auto;display:flex;flex-direction:column;gap:14px;padding:clamp(20px,4vh,44px) clamp(18px,2.4vw,30px);border-right:1px solid var(--line);overflow:hidden}
+.panel .cols{flex:1;min-height:0;display:flex;gap:14px;align-items:flex-start}
+.panel .col{width:min(80vw,340px);display:flex;flex-direction:column;gap:14px}
+.panel header{flex:0 0 auto;border-bottom:1px solid var(--line);padding-bottom:10px}
+.panel h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:2.4rem;line-height:1;text-wrap:balance}
+.capblock{display:grid;gap:6px;padding-top:2px}
+.story .pic,.photo .pic{height:100%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#000}
+.story .pic img{display:block;height:100%;width:auto;max-width:min(68vw,1400px);object-fit:cover}
+/* matted: smaller photo framed on the dark wall, for low-res or very close-up images */
+.mat .pic{background:var(--void);padding:clamp(28px,8vh,88px) clamp(24px,4vw,56px)}
+.mat .pic img{height:auto!important;max-height:100%;max-width:min(56vw,820px)!important;object-fit:contain!important;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.white .pic{background:#fff;padding:clamp(16px,3vh,32px) clamp(16px,2vw,32px)}
+.white .pic img{width:min(72vw,1500px);height:100%!important;max-width:none!important;object-fit:contain!important}
+.photo{display:flex;background:#000}
+.photo .pic img{display:block;height:100%;width:auto;max-width:min(68vw,1400px);object-fit:cover}
+.photo.contain .pic{padding:clamp(16px,3vh,32px)}
+.photo.contain .pic img{object-fit:contain;max-height:100%;height:auto;max-width:min(60vw,900px)}
+.photo figcaption{width:min(340px,80vw);flex:0 0 auto;padding:clamp(20px,4vh,40px) clamp(18px,2.4vw,30px);display:flex;flex-direction:column;justify-content:flex-end;gap:10px;background:var(--void);border-left:1px solid var(--line);overflow:hidden}
+.photo h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1;text-wrap:balance}
+@media (max-width:760px){
+  .photo .pic img{max-width:none}
+  .photo.contain .pic img{max-width:90vw}
+  .photo figcaption{font-size:.8rem}
+}
+
+/* legends */
+.legends-frame{display:flex;flex-direction:column;gap:18px}
+.sec-title{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(2.4rem,6vh,3.8rem);line-height:1}
+.legends{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:min(78vw,300px);gap:14px;align-content:start}
+@media (max-height:640px){.legends{grid-template-rows:auto}}
+.plaque{position:relative;background:linear-gradient(180deg,var(--stage),var(--void));border:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0;overflow:hidden;transition:transform .25s ease,border-color .25s ease}
+.plaque:hover{transform:translateY(-3px);border-color:var(--accent)}
+.plaque .no{position:absolute;right:12px;top:4px;font-family:var(--f-display);font-size:3.6rem;line-height:1;color:var(--line)}
+.plaque .logo{height:46px;width:150px;align-self:flex-start}
+.plaque .metric{font-family:var(--f-display);font-size:clamp(2rem,4vw,2.8rem);line-height:1;color:var(--accent)}
+.plaque h4{margin:0;font-weight:600;font-size:1rem;line-height:1.35}
+.plaque .meta{margin-top:auto;font-family:var(--f-mono);font-size:.7rem;color:var(--dim)}
+
+/* wall */
+.wall-frame{display:flex;flex-direction:column;gap:18px}
+.wall{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,minmax(0,1fr));grid-auto-columns:clamp(200px,30vh,320px);gap:14px}
+@media (max-height:640px){.wall{grid-template-rows:repeat(3,minmax(0,1fr))}}
+.wall .logo{height:100%;width:100%;padding:clamp(12px,2.4vh,26px) clamp(16px,2vw,30px);transition:transform .2s ease}
+.wall .logo:hover{transform:scale(1.04)}
+
+/* quotes */
+.quotes-frame{display:flex;flex-direction:column;gap:18px}
+.qrow{display:flex;gap:18px;align-items:flex-start}
+.quote{display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;background:var(--stage);border:1px solid var(--line);padding:22px;margin:0;width:min(84vw,460px)}
+.quote img.face{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--accent)}
+.quote blockquote{margin:0;font-size:1.05rem;line-height:1.55}
+.quote cite{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;font-style:normal;font-family:var(--f-label);font-size:1rem;color:var(--dim)}
+.quote cite b{color:var(--ink)}
+.quote cite .logo{height:32px;width:88px}
+@media (max-width:520px){.quote{grid-template-columns:1fr}}
+
+/* end card */
+.end{width:min(88vw,520px);display:flex;flex-direction:column;justify-content:center;gap:18px;background:radial-gradient(80% 60% at 30% 40%,rgba(255,107,26,.2),transparent)}
+.end .slab{font-size:clamp(3rem,10vw,5.5rem);align-self:flex-start}
+.end p{margin:0;color:var(--dim)}
+.end code{font-family:var(--f-mono);font-size:.78rem;color:var(--ink)}
+
+/* ---------- BOTTOM BAR: month timeline ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;height:calc(var(--bar) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--void);border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;z-index:20}
+.bar > button{background:transparent;border:1px solid var(--line);color:var(--ink);width:38px;height:34px;cursor:pointer;font-size:1.1rem;flex:0 0 auto}
+.bar > button:hover{border-color:var(--accent)}
+.tl{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:stretch}
+.tl::before{content:"";position:absolute;left:0;right:0;top:22px;height:2px;background:var(--line)}
+.tl .fill{position:absolute;left:0;top:22px;height:2px;background:var(--accent);width:0;transition:width .15s linear}
+.tl ol{position:relative;list-style:none;margin:0;padding:0;display:flex;justify-content:space-between;width:100%}
+.tl li{flex:1 1 0;display:flex;justify-content:center;min-width:0}
+.tl button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:16px;font-family:var(--f-label);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.82rem;color:var(--dim);white-space:nowrap}
+.tl button::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--void);border:2px solid var(--faint);transition:all .2s ease}
+.tl button:hover{color:var(--ink)}
+.tl button:hover::before{border-color:var(--ink)}
+.tl button.past::before{background:var(--accent);border-color:var(--accent)}
+.tl button.on{color:var(--accent)}
+.tl button.on::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,107,26,.25)}
+.tl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:600px){
+  .bar > button{display:none}
+  .tl button{font-size:.66rem;letter-spacing:.02em}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .swipe i,.plaque{animation:none;transition:none}
+}
+
+/* ---------- TEAM ---------- */
+.team-ch{background:linear-gradient(180deg,var(--void),var(--accent-deep))}
+.team{display:flex;flex-direction:column;gap:14px}
+.team header h2{margin:0}
+.team-grid{display:grid;grid-template-rows:repeat(2,minmax(0,1fr));grid-template-columns:repeat(9,clamp(170px,15vw,230px));gap:14px;flex:1;min-height:0}
+.tm{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);overflow:hidden;min-height:0}
+.tm .ph{flex:1;min-height:0;overflow:hidden;background:var(--stage)}
+.tm .ph img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;filter:grayscale(1) contrast(1.05);transition:filter .45s ease,transform .6s ease}
+.tm:hover .ph img{filter:none;transform:scale(1.03)}
+.tm .meta{padding:10px 12px 12px;display:grid;gap:4px}
+.tm .nm{font-family:var(--f-label);font-weight:700;font-size:1.15rem;letter-spacing:.02em;line-height:1.1}
+.tm .ttl{font-family:var(--f-label);font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);line-height:1.25}
+.tm .row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.tm button.ab{all:unset;cursor:pointer;font-family:var(--f-label);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;color:var(--accent)}
+.tm a.li{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;color:var(--dim);border:1px solid var(--line)}
+.tm a.li:hover{color:var(--void);background:var(--accent);border-color:var(--accent)}
+.tm .ov{position:absolute;inset:0;background:var(--void);padding:16px 14px 12px;font-size:.88rem;line-height:1.5;color:var(--ink);display:none;flex-direction:column;gap:10px}
+.tm.open .ov{display:flex}
+.tm .ov p{margin:0;flex:1;min-height:0;overflow:auto}
+.tm .ov .x{flex:none}
+
+/* confidentiality */
+.conf{display:grid;gap:8px;justify-items:start}
+.conf-tag{font-family:var(--f-label);font-weight:700;font-size:.82rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:3px 10px 2px}
+.conf-note{font-family:var(--f-label);font-size:1rem;letter-spacing:.04em;color:#ddd5ce;max-width:46ch}
+.end .fine{margin-top:auto;font-size:.72rem;line-height:1.55;color:var(--faint);max-width:52ch;border-top:1px solid var(--line);padding-top:14px}
+.end .fine b{color:var(--dim);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.68rem}
+.end .slab.welcome{font-size:clamp(2.8rem,7vw,4.6rem);line-height:1.02;padding:.1em .22em .2em}
+.team-grid{grid-template-rows:none!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))!important}
+.team .tm .ph{aspect-ratio:4/5;flex:none}
+.team{width:100%}
+/* ---------- VERTICAL VERSION: same content, top-to-bottom page scroll ---------- */
+body{overflow:auto;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:0}
+.strip{position:static;display:block;overflow:visible;cursor:auto;padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
+.frame{height:auto;width:100%;border-right:0;border-bottom:1px solid var(--line)}
+.frame.pad{padding:clamp(28px,6vh,64px) max(16px,5vw)}
+.hero{width:100%;height:calc(100svh - var(--bar))}
+.swipe i{transform:rotate(90deg);animation:nudgeY 1.6s ease-in-out infinite}
+@keyframes nudgeY{50%{transform:rotate(90deg) translateX(8px)}}
+.chapter{width:100%;min-height:42vh;justify-content:flex-end}
+.chapter .topic{font-size:clamp(3rem,9vw,6rem)}
+.chapter p{max-width:48ch;font-size:1.1rem}
+.chapter:has(.lead){width:100%}
+.chapter .lead{max-width:520px}
+.month .cols,.panel .cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px;align-items:stretch}
+.story,.photo{flex-direction:row;align-items:stretch;min-height:70vh}
+.story .panel{flex:0 0 min(44%,560px);border-right:1px solid var(--line);overflow:visible}
+.story .panel .cols{grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr))}
+.story .pic,.photo .pic{flex:1 1 auto;height:auto;min-width:0}
+.story .pic img,.photo .pic img{width:100%;height:100%;max-width:none;max-height:90vh;object-fit:cover}
+.mat .pic img{width:auto;max-width:100%!important;max-height:80vh}
+.white .pic img{width:100%;height:auto!important;max-height:85vh}
+.photo figcaption{width:min(380px,36%);justify-content:flex-end}
+@media (max-width:860px){
+  .story,.photo{flex-direction:column;min-height:0}
+  .story .panel{flex:none;border-right:0;border-bottom:1px solid var(--line)}
+  .story .pic img,.photo .pic img{height:auto;max-height:none}
+  .photo figcaption{width:100%;border-left:0;border-top:1px solid var(--line)}
+}
+.wall{grid-auto-flow:row;grid-template-rows:none;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));grid-auto-columns:auto}
+.end{width:100%;min-height:60vh}
+.chapter .side-img{margin:0}
+.chapter .side-img img,.chapter .side-img.small img{height:auto;max-height:72vh;max-width:40vw}
+.chapter.has-side .txt{flex:1}
+.story .poster{flex:0 0 min(42%,560px);height:auto}
+.story .poster img{width:100%;height:auto;max-width:none}
+.wall .logo{height:clamp(96px,14vh,140px)}
+.photo.whole .pic img{width:100%;height:auto;max-height:none;object-fit:contain}
+.photo.press{width:100%;min-height:0}
+.photo.whole.press .pic{flex:none;height:auto}
+.photo.whole.press .pic img{height:auto}
+.photo.press .press-row img{height:auto}
+@media (max-width:860px){.photo.press .press-row{grid-template-columns:1fr}}
+@media (max-width:860px){.chapter.has-side{flex-direction:column}.chapter .side-img img,.chapter .side-img.small img{max-width:100%;max-height:60vh}.story .poster{flex:none;width:100%}}
+</style>
+</head>
+<body>
+
+
+<main class="strip" id="strip" tabindex="0" aria-label="Freya başarıları"></main>
+
+<nav class="bar" aria-label="Zaman çizelgesi">
+  <button type="button" id="prev" aria-label="Geri">‹</button>
+  <div class="tl"><div class="fill" id="fill"></div><ol id="months"></ol></div>
+  <button type="button" id="next" aria-label="İleri">›</button>
+</nav>
+
+<script>
+const IU="Investor Update";
+// Topics, in reading order. Each story = its cards + the photos that belong to it, placed side by side.
+// Months, in reading order. Each story = its cards + the photos that belong to it, placed side by side.
+// Stories inside a month run by date (story.d, else the earliest card). Ekip stays last on purpose.
+// YouTube link for the Haziran quote; empty = the quote and player stay hidden
+const YT_URL="https://youtu.be/rGW-0MyyjwA?t=1156";
+const TOPICS=[
+ {tl:"Ocak",eyebrow:"2026",title:"Ocak",lead:{logo:"Mastercard Lighthouse",cards:[
+   {d:"2026-01",who:"Mastercard Lighthouse",nologo:true,t:"Mastercard Lighthouse x EBRD Star Venture programına kabul edilen 5 girişimden biri; Mastercard'ın resmi partneri",m:"",src:IU+" · Şubat 2026"}]},stories:[
+  {d:"2026-01",cards:[],photos:[
+   {img:"photos/mastercard-odul.jpg",bare:true,title:"Mastercard Lighthouse Türkiye 2025 ödülleri"},
+   {img:"photos/mastercard.jpg",overlay:true,when:"Ocak 2026 · Mastercard Lighthouse",credit:"Fotoğraf: Mastercard Lighthouse Türkiye"}]}
+ ]},
+ {tl:"Şubat",eyebrow:"2026",title:"Şubat",stories:[
+  {d:"2026-02-03",cards:[],poster:{img:"photos/hackathon-poster.jpg",alt:"Voice AI Hackathon, Freya × fal"},photos:[
+   {img:"photos/hackathon-fal.jpg",when:"Şubat 2026 · Voice AI Hackathon",credit:"Fotoğraf: Freya"}]}
+ ]},
+ {tl:"Mart",eyebrow:"2026",title:"Mart",lead:{logo:"Garanti BBVA",cards:[
+   {d:"2026-03",who:"Garanti BBVA",nologo:true,t:"Garanti BBVA, on-prem IVR için Freya'yı satın aldı.",m:"Satın aldı",src:"KB · customers/garanti"}]},stories:[
+  {d:"2026-03",cards:[],photos:[
+   {img:"photos/garanti-ekip-v2.jpg",overlay:true,when:"Ekim 2026 · Garanti BBVA",credit:"Fotoğraf: Freya"}]}
+ ]},
+ {tl:"Haziran",eyebrow:"2026",title:"Haziran",lead:{cap:{when:"Haziran 2026",title:"Türkiye Yapay Zeka Zirvesi"},quote:"Dünyadaki Türkler Konuşuyor",yt:YT_URL},stories:[
+  {d:"2026-06",cards:[],photos:[
+   {img:"photos/ai-zirvesi.jpg",overlay:true,when:"“Dünyadaki Türkler Konuşuyor”"}]}
+ ]},
+ {tl:"Temmuz",eyebrow:"2026",title:"Temmuz",side:{img:"photos/garanti-partners.png",alt:"Garanti BBVA Partners Tech 10. dönem",small:true},lead:{cards:[
+   {d:"2026-07-10",who:"Garanti BBVA Partners",t:"Garanti BBVA Partners Tech 10. dönemine seçilen 5 girişimden biri, dönemin 1 numarası",m:"#1",src:"garantibbva.com.tr · webrazzi · "+IU+" Haz 2026"}]},stories:[]},
+ {tl:"Eylül",eyebrow:"2026",title:"Eylül",dark:true,lead:{cap:{when:"Eylül 2026 · Design Arena",title:"Dünyanın en insansı sesi"}},stories:[
+  {d:"2026-09-01",cards:[],photos:[
+   {img:"photos/design-arena.png",bare:true,white:true,title:"Design Arena Audio Realism Bench"}]},
+  {d:"2026-09-15",cards:[],
+   photos:[
+   {img:"photos/hackzone-ekip.jpg",overlay:true,when:"15 Eylül 2026 · Hackzone by Allianz",credit:"Fotoğraf: Freya"},
+   {img:"photos/ntv.jpg",bare:true,whole:true,title:"NTV",below:[{img:"photos/basin-aa.jpg",alt:"AA İş Dünyası Haberleri: Freya yapay zeka ses modeliyle değerlendirme testlerinde ilk sırada yer aldı"},{img:"photos/basin-sondakika.jpg",alt:"SonDakika.com: Türkçe ses teknolojisinde küresel başarı: Freya TTS Adam V1, Design Arena'da zirvede"}]}]}
+ ]},
+ {tl:"Ekim",eyebrow:"2026",title:"Ekim",lead:{cap:{when:"Ekim 2026 · Aktifbank"}},stories:[
+  {d:"2026-10",cards:[],photos:[
+   {img:"photos/aktifbank-vaka.jpg",bare:true,whole:true,title:"Aktifbank: Freya tahsilatta insanı geçti, %53"}]}
+ ]},
+ {tl:"Kasım",eyebrow:"2026",title:"Kasım",lead:{cap:{title:"Türkiye Bankalar Tahsilat Zirvesi"}},stories:[
+  {d:"2026-11",cards:[],
+   photos:[
+   {img:"photos/bcm-zirvesi.jpg",overlay:true,when:"Kasım 2026 · Türkiye Bankalar Tahsilat Zirvesi",credit:"Fotoğraf: Türkiye Bankalar Tahsilat Zirvesi"}]}
+ ]},
+ // after the months: all banks together, all insurers together
+ {tl:"Bankalar",sector:true,title:"Bankalar",cards:[
+   {d:"2026-10-02",who:"Garanti BBVA",t:"Garanti BBVA'nın IVR'ında yapay zeka: banka içinde kurulu, çağrı yönlendirmede %94,6 doğruluk.",m:"IVR",src:"KB · customers/garanti"},
+   {d:"2026-08",who:"Aktifbank",t:"Tahsilat agent'ı ödeme sözünde %53'e ulaştı; insan temsilciler %51.",m:"Tahsilat",src:IU+" · KB customers/aktifbank"},
+   {d:"2026-09-22",who:"Yapı Kredi",t:"Türkiye'nin 7. büyük bankası, 6 aylık tahsilat pilotu için Freya'yı seçti.",m:"Tahsilat",src:"KB · customers/yapikredi"},
+   {d:"2026-10-23",who:"Vakıfbank",t:"Sistem Mimari Komitesi, banka içinde kurulacak POC'un mimarisini onayladı.",m:"Tahsilat",src:"KB · customers/vakifbank"},
+   {d:"2026-11-04",who:"DenizBank",t:"1-30 gün gecikmeli tahsilat agent'ı Zeynep, DenizBank çağrı merkezi ekibine canlı aramalarla gösterildi.",m:"Tahsilat",src:"KB · customers/denizbank"}]},
+ {tl:"Sigorta",sector:true,title:"Sigorta",cards:[
+   {d:"2026-08",who:"Sigortam.net",t:"Lead'den satışa dönüşüm %1'den %5'in üstüne çıktı. İlk 1000 çağrıda %52,6 başarı; insan temsilcilerde %40.",m:"5 kat satış",src:IU+" · KB customers/sigortamnet"},
+   {d:"2026-08-21",who:"Allianz",t:"Bireysel emekliliğe yeni katılan Allianz müşterilerini Freya karşılıyor; 21 Ağustos'tan beri gerçek müşteri çağrıları.",m:"BES Hoş Geldin",src:"KB · customers/allianz"},
+   {d:"2026-10",who:"Sompo",t:"Çağrı merkezinin yarısını ses agent'larına taşımak isteyen Sompo'da dosya sorgulama Freya'da; ilk tam gün %80,6.",m:"%80,6",src:"KB · customers/sompo"},
+   {d:"2026-11",who:"Türkiye Sigorta",t:"Türkiye Sigorta müşterilerini arayan sesli asistan Bilge, eksik evrakları müşteriyle tamamlıyor.",m:"Asistan Bilge",src:IU+" · KB customers/turkiye-sigorta"},
+   {d:"2026-11",who:"Aksigorta",t:"Otomatik yenilemesi kapalı poliçe sahiplerini arayıp poliçesini yenilemeye davet ediyor.",m:"Poliçe yenileme",src:"KB · customers/aksigorta"},
+   {d:"2026-11",who:"Hepiyi",t:"Arayana poliçelerini okuyor, istediğini e-posta ya da WhatsApp'tan gönderiyor; Türkçe ve İngilizce.",m:"TR + EN",src:"KB · customers/hepiyi"}]},
+ {tl:"Ekibimiz",eyebrow:"Freya",title:"Ekibimiz",lead:{cap:{when:"1 Temmuz 2026",title:"Freya 1. yaş partisi"},text:"Bir yıl önce bir demo ve bir fikirdi. Bugün bankaların ve sigortacıların müşteri hattında konuşan sesleri yapan bir ekibiz. İlk yaşımızı Boğaz'da, gün batarken hep birlikte kutladık."},stories:[
+  {cards:[],
+   photos:[
+   {img:"photos/tekne-partisi.jpg",overlay:true,when:"İstanbul Boğazı",credit:"Fotoğraf: Freya"}]}
+ ]}
+];
+const LOGOS={
+ "Y Combinator":"yc.svg","Mastercard Lighthouse":"mastercard.png","Hackzone":"hackzone.png","THY":"thy.svg",
+ "Allianz":"allianz.png","Doğuş Oto":"dogus.png","Sigortam.net":"sigortamnet.png",
+ "KKB":"kkb.png","Aktifbank":"aktifbank.png","Türkiye Sigorta":"turkiyesigorta.png","Sompo":"sompo.svg",
+ "Yapı Kredi":"yapikredi.png","Hepiyi":"hepiyi.svg","Freya":"freya-logo.png","Garanti BBVA":"garanti.svg","Garanti BBVA Partners":"garanti-partners.png",
+ "Ödeal":"odeal.png","DenizBank":"denizbank.svg","Aksigorta":"aksigorta.svg","EmlakJet":"emlakjet.svg","Vakıfbank":"vakifbank.svg",
+ "ikas":"ikas.png","Suri":"suri.png"
+};
+const DARK=new Set(["Garanti BBVA Partners"]);
+const WALL=["Garanti BBVA","Yapı Kredi","Vakıfbank","Aktifbank","Allianz","Türkiye Sigorta","Sompo","Aksigorta","Sigortam.net","Hepiyi","DenizBank","Doğuş Oto","Ödeal","EmlakJet","ikas","Suri","Mastercard Lighthouse"];
+const MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtDay=d=>{const p=d.split("-");return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:`${MONTHS[+p[1]-1]} ${p[0]}`};
+const EN=/(Mastercard Lighthouse|Voice AI Hackathon|Design Arena|Hackzone by Allianz|Hackzone|Garanti BBVA Partners|Garanti BBVA|Allianz|Sompo|Y Combinator|Freya)/g;
+const L=t=>esc(t).replace(EN,'<span lang="en">$1</span>');
+const logo=(who)=>LOGOS[who]?`<span class="logo${DARK.has(who)?" dark":""}"><img src="logos/${LOGOS[who]}" alt="${esc(who)}" loading="lazy"></span>`:"";
+
+/* ---------- BUILD STRIP ---------- */
+const frames=[];
+frames.push(`<section class="frame hero" data-label="Başlangıç">
+  <img src="photos/yc.jpg" alt="Tomas Nepala ve Tunga Bayrak, Y Combinator">
+  <div class="swipe" aria-hidden="true">Aşağı kaydır <i></i></div>
+  <div class="hero-copy">
+    <div class="conf"><span class="conf-tag">Kurum içi / Gizli</span><span class="conf-note">Ekibe yeni katılan arkadaşlarımızla paylaşılmak üzere hazırlanmıştır.</span></div>
+    <h1><span class="slab">FREYA</span></h1>
+    <p>Y Combinator'dan Mastercard Lighthouse'a,<br>Allianz'dan Garanti IVR'ına</p>
+    <div class="stat"><b>3,5M USD</b><span>YC S25 yatırımı</span></div>
+  </div>
+  <div class="gcap">
+    <span class="when">2025 · <span lang="en">Y Combinator</span></span>
+    <span class="names">Tomas Nepala, Tunga Bayrak</span>
+  </div>
+</section>`);
+
+const capInner=p=>`<span class="when">${L(p.when||"")}</span>
+      ${p.text?`<span>${esc(p.text)}</span>`:""}
+      ${p.names?`<span class="names">${esc(p.names)}</span>`:""}
+      ${p.names2?`<span class="names">${esc(p.names2)}</span>`:""}
+      ${p.credit?`<span class="credit">${esc(p.credit)}</span>`:""}`;
+const picHtml=p=>`<div class="pic"><img src="${p.img}" alt="${esc(p.title||p.when||"")}" loading="lazy"></div>`;
+// a later photo of the same story: picture with its caption beside it, or the picture alone
+const ovCap=p=>`<div class="gcap ovcap"><span class="when">${L(p.when||"")}</span>${p.title&&!p.bare?`<b class="ovt">${esc(p.title)}</b>`:""}${p.text?`<span>${esc(p.text)}</span>`:""}${p.credit?`<span class="credit">${esc(p.credit)}</span>`:""}</div>`;
+const photoFrame=p=>p.whole
+  ?`<figure class="frame photo whole${p.below?" press":""}">${picHtml(p)}${p.below?`<div class="press-row">${p.below.map(b=>`<img src="${b.img}" alt="${esc(b.alt||"")}" loading="lazy">`).join("")}</div>`:""}</figure>`
+  :p.overlay
+  ?`<figure class="frame photo ov">${picHtml(p)}${ovCap(p)}</figure>`
+  :p.bare
+  ?`<figure class="frame photo${p.mat?" mat":""}${p.white?" white":""}">${picHtml(p)}</figure>`
+  :`<figure class="frame photo${p.mat?" mat":""}">${picHtml(p)}
+    <figcaption class="gcap"><span class="when">${L(p.when||"")}</span>${p.title?`<h3>${esc(p.title)}</h3>`:""}
+      ${p.text?`<span>${esc(p.text)}</span>`:""}
+      ${p.credit?`<span class="credit">${esc(p.credit)}</span>`:""}</figcaption>
+  </figure>`;
+const cardHtml=r=>`<article class="card">
+      <div class="top"><span class="d">${fmtDay(r.d)}</span><span class="m">${esc(r.m)}</span></div>
+      <div class="who">${r.nologo?"":logo(r.who)}<span>${L(r.who)}</span></div>
+      <div class="t">${esc(r.t)}</div>
+      <div class="src">${esc(r.src)}</div>
+    </article>`;
+const brandCard=r=>`<article class="card brand">
+      <span class="logo big">${LOGOS[r.who]?`<img src="logos/${LOGOS[r.who]}" alt="${esc(r.who)}" loading="lazy">`:esc(r.who)}</span>
+      <div class="bname">${L(r.who)}</div>
+      <div class="bm">${esc(r.m)}</div>
+      <div class="t">${esc(r.t)}</div>
+      <div class="src">${fmtDay(r.d)} · ${esc(r.src)}</div>
+    </article>`;
+const ytId=u=>(String(u).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/)||[])[1];
+const leadHtml=l=>!l?"":`<div class="lead">${l.logo&&LOGOS[l.logo]?`<span class="logo lead-logo"><img src="logos/${LOGOS[l.logo]}" alt="${esc(l.logo)}"></span>`:""}${(l.cards||[]).map(cardHtml).join("")}${l.cap?`<div class="gcap capblock">${l.cap.when?`<span class="when">${L(l.cap.when)}</span>`:""}${l.cap.title?`<h3>${esc(l.cap.title)}</h3>`:""}${l.cap.credit?`<span class="credit">${esc(l.cap.credit)}</span>`:""}</div>`:""}${l.text?`<p class="lead-text">${esc(l.text)}</p>`:""}${l.quote&&l.yt?`<a class="yt-quote" href="${esc(l.yt)}" target="_blank" rel="noopener">“${esc(l.quote)}”</a>`:""}${l.yt&&ytId(l.yt)?`<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${ytId(l.yt)}${(String(l.yt).match(/[?&]t=(\d+)/)||[])[1]?`?start=${String(l.yt).match(/[?&]t=(\d+)/)[1]}`:""}" title="${esc(l.quote||"YouTube")}" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`:""}</div>`;
+const SECTOR={"Aktifbank":"banka","Yapı Kredi":"banka","Vakıfbank":"banka","DenizBank":"banka","Garanti BBVA":"banka",
+ "Sigortam.net":"sigorta","Allianz":"sigorta","Sompo":"sigorta","Türkiye Sigorta":"sigorta","Aksigorta":"sigorta","Hepiyi":"sigorta"};
+const SECTORS=[["banka","Bankalar"],["sigorta","Sigorta"],["diger",""]];
+const firstDate=st=>st.d||(st.cards.map(c=>c.d).sort()[0])||"";
+const renderTopic=(tp,ti)=>{
+  if(tp.sector){
+    frames.push(`<section class="frame pad month sector" data-tl="${esc(tp.tl)}"><header><h2>${esc(tp.title)}</h2></header><div class="cols">${tp.cards.slice().sort((a,b)=>a.d.localeCompare(b.d)).map(brandCard).join("")}</div></section>`);
+    return;
+  }
+  const side=tp.side?`<div class="side-img${tp.side.small?" small":""}"><img src="${tp.side.img}" alt="${esc(tp.side.alt||"")}" loading="lazy"></div>`:"";
+  frames.push(`<section class="frame pad chapter${side?" has-side":""}${tp.dark?" dark-ch":""}" data-tl="${esc(tp.tl)}">${side}<div class="txt"><div class="eyebrow">${esc(tp.eyebrow||"")}</div><div class="topic">${esc(tp.title)}</div>${tp.intro?`<p>${esc(tp.intro)}</p>`:""}${leadHtml(tp.lead)}</div></section>`);
+  // stories run in date order inside a topic
+  tp.stories.slice().sort((a,b)=>firstDate(a).localeCompare(firstDate(b))).forEach(st=>{
+    const head=st.title?`<header><h2>${esc(st.title)}</h2></header>`:"";
+    const cards=st.cards.map(st.brand?brandCard:cardHtml).join("");
+    const [first,...rest]=st.photos||[];
+    if(st.poster){
+      const [ph,...more]=st.photos;
+      frames.push(`<figure class="frame story ov"><div class="poster"><img src="${st.poster.img}" alt="${esc(st.poster.alt||"")}" loading="lazy"></div>${picHtml(ph)}${ovCap(ph)}</figure>`);
+      more.forEach(p=>frames.push(photoFrame(p)));return;
+    }
+    if(!st.cards.length){(st.photos||[]).forEach(p=>frames.push(photoFrame(p)));return}
+    if(st.brand&&!first){
+      SECTORS.forEach(([key,label])=>{
+        const cs=st.cards.filter(c=>(SECTOR[c.who]||"diger")===key);
+        if(cs.length)frames.push(`<section class="frame pad month">${label?`<header><h2>${label}</h2></header>`:""}<div class="cols">${cs.map(brandCard).join("")}</div></section>`);
+      });
+      return;
+    }
+    if(!first){
+      frames.push(`<section class="frame pad month">${head}<div class="cols">${cards}</div></section>`);
+      return;
+    }
+    // first photo shares one frame with the story's title and cards, so no half-empty column stands alone
+    frames.push(`<figure class="frame story ov${first.mat?" mat":""}${first.white?" white":""}">
+      <div class="panel">${head}<div class="cols">${cards}</div></div>
+      ${picHtml(first)}${ovCap(first)}
+    </figure>`);
+    rest.forEach(p=>frames.push(photoFrame(p)));
+  });
+};
+TOPICS.filter(t=>t.tl!=="Ekibimiz").forEach(renderTopic);
+
+frames.push(`<section class="frame pad wall-frame">
+  <div class="eyebrow">Müşteriler, partnerler, programlar</div><h2 class="sec-title">Bize güvenenler</h2>
+  <div class="wall">${WALL.map(logo).join("")}</div>
+</section>`);
+
+const TEAM=[{"n": "Tunga Bayrak", "t": "CEO & Co-Founder", "ab": "University of Pennsylvania'da okudu, kuantum hesaplama ve yapay zekâ araştırmaları yaptı. Freya'dan önce yapay zekâ destekli eğitim girişimi MotionShark'ın kurucu ortağıydı. Freya'yı Y Combinator S25 döneminde kurdu, CEO olarak şirketi ve ses modeli araştırma ekibini yönetiyor.", "img": "photos/team/tunga.jpg", "li": "https://www.linkedin.com/in/tunga-bayrak/"}, {"n": "Yavuz Öztürk", "t": "Founding Engineer", "ab": "Bilkent Üniversitesi'nde okudu, Bilkent AI Society'nin kurucu başkanıydı. TÜBİTAK BİLGEM ve Utrecht University'de doğal dil işleme üzerine araştırma yaptı, Infrastack AI'da kurucu mühendis olarak çalıştı. Freya'da teknik ekibi, entegrasyonları ve bankalardaki kurum içi kurulumları yönetiyor.", "img": "photos/team/yavuz.jpg", "li": "https://www.linkedin.com/in/yavuzalpsencerozturk/"}, {"n": "Pyae (Ricky) Myo", "t": "Founding Engineer", "ab": "Yazılım geliştirmede altı yılı aşkın deneyimi var. Vacuumlabs, Persona AI ve Yoma Group'ta çalıştı, MotionShark'ta ses yapay zekâsı altyapısını sıfırdan kurdu. Freya'da platformun, telefon entegrasyonlarının ve kurum içi kurulumların ana mimarı.", "img": "photos/team/ricky.jpg", "li": "https://www.linkedin.com/in/pyaesonemyo/"}, {"n": "Mısra Koşarsoy", "t": "Operations", "ab": "Freya'dan önce Azimut Portföy ve Hedef Portföy'de portföy yönetimi alanında çalıştı. Freya'da operasyonları yönetiyor: satış süreçleri, sözleşmeler, satın alma ve kurumsal müşterilerle koordinasyon.", "img": "photos/team/misra.jpg", "li": "https://www.linkedin.com/in/misra-kosarsoy-mm03kk/"}, {"n": "Can Kocagil", "t": "Head of Product", "ab": "Kariyerine OREDATA'da bankacılık, enerji ve telekom için makine öğrenmesi modelleri geliştirerek başladı. 130 ülkede 620 binden fazla kullanıcıya ulaşan Finceptor'ın kurucu ortağı ve CEO'su, ardından Londra'da Upcap'in kurucu ortağı oldu. Freya'da Head of Product olarak ürün ve teslimat ekibini yönetiyor.", "img": "photos/team/cankocagil.jpg", "li": "https://www.linkedin.com/in/can-kocagil/"}, {"n": "Yunus Emre Yurdagül", "t": "Forward Deployed Engineer", "ab": "Fulbright bursuyla Columbia University'de finans mühendisliği okudu. Mastercard Advisors'ta danışman olarak çalıştı, Tiffany & Co., Kering ve Property Finder'da strateji ve analitik rollerinde yer aldı. Freya'da bankacılık müşterilerinde, özellikle Garanti BBVA'da sesli asistanları canlıya alıyor.", "img": "photos/team/yunus.jpg", "li": "https://www.linkedin.com/in/yunus-emre-yurdagul/"}, {"n": "Harun Bakırtaş", "t": "Forward Deployed Engineer", "ab": "Mastercard'da Associate Consultant olarak çalıştı, Boston Consulting Group, Raiffeisen Bank International, Pfizer ve QNB'de danışmanlık ve yatırım bankacılığı deneyimi kazandı. Freya'da Enpara, Aksigorta ve Yapı Kredi projelerini yürütüyor.", "img": "photos/team/harun.jpg", "li": "https://www.linkedin.com/in/harunbakirtas/"}, {"n": "Yusuf Danış", "t": "Forward Deployed Engineer", "ab": "Ankara Üniversitesi'nde okudu, Ankara University Computer Society'nin yönetiminde yer aldı. Yapı Kredi Teknoloji'de bankacılık altyapısında, VBT Software'de backend geliştirmede çalıştı. Freya'da Lead Forward Deployed Engineer olarak senaryo tasarımından canlıya geçişe kadar müşteri kurulumlarını yönetiyor.", "img": "photos/team/yusuf.jpg", "li": "https://www.linkedin.com/in/yusufdanis/"}, {"n": "Berke Yalçın", "t": "Forward Deployed Engineer", "ab": "Finceptor'da Head of Growth olarak 600 binden fazla kullanıcıya ulaşan büyümeyi ve 150'yi aşkın B2B ortaklığı yönetti, DeepMaze Finance ve Scene Global'de çalıştı. Freya'da müşteri projelerinin kurulumunu ve başarısını yönetiyor.", "img": "photos/team/berke.jpg", "li": "https://www.linkedin.com/in/berkeyallciin/"}, {"n": "Murathan Bayram", "t": "Forward Deployed & AI Engineer", "ab": "Upcap, Tachyo ve Tokens of Appreciation'da kurucu mühendis olarak yapay zekâ ve blockchain ürünleri geliştirdi, yapay zekâ ajanı platformu Dialoq'un kurucu ortağıydı. Freya'da Garanti BBVA, Türkiye Sigorta ve Aktifbank için asistanlar ve entegrasyonlar geliştiriyor.", "img": "photos/team/murathan.jpg", "li": "https://www.linkedin.com/in/murathanje/"}, {"n": "Talha Sarı", "t": "Forward Deployed & AI Engineer", "ab": "Garanti BBVA Teknoloji'de yazılım ekipleri için yapay zekâ araçları geliştirdi, Jetlink'in ilk yapay zekâ mühendisi olarak çok ajanlı bir ürünü canlıya taşıdı. Freya'da Sompo ve sigortacılık müşterileri için sesli asistanlar geliştiriyor.", "img": "photos/team/talha.jpg", "li": "https://www.linkedin.com/in/talhasari/"}, {"n": "Mehmet Uzel", "t": "Forward Deployed & AI Engineer", "ab": "Huawei'de telekom verisi ve makine öğrenmesi, Thomas Murray'de Python servisleri üzerine çalıştı, kurduğu UZELABS'ın uygulamaları 150 binden fazla indirildi. Freya'da asistan kurulumu ve performans iyileştirmeleri üzerinde çalışıyor.", "img": "photos/team/mehmet.jpg", "li": "https://www.linkedin.com/in/mehmet-uzel-925601136/"}, {"n": "Reşit Aydın", "t": "Forward Deployed & AI Engineer", "ab": "Gebze Teknik Üniversitesi'nde araştırmacı olarak yer aldı. Optimum7'de AI Engineer, Coiltech'te AI Research Engineer olarak çalıştı, Finlandiya'da RAG sistemleri üzerine staj yaptı. Freya'da platform geliştirmeleri, simülasyonlar ve kişisel veri maskeleme üzerinde çalışıyor.", "img": "photos/team/resit.jpg", "li": "https://www.linkedin.com/in/resit-aydin/"}, {"n": "Ege Hakan Karaağaç", "t": "Forward Deployed & AI Engineer", "ab": "Amazon'da Lüksemburg'da Checkout ve Tax ekiplerinde, ardından Dream Games'te yüksek trafikli backend sistemlerinde çalıştı, BrandVox AI'ın kurucu ortağı ve CTO'suydu. Freya'da müşteri asistanlarını geliştiriyor.", "img": "photos/team/hakan.jpg", "li": "https://www.linkedin.com/in/egehakankar/"}, {"n": "Serkan Özmen", "t": "DevOps Engineer", "ab": "Halkbank, Garanti BBVA Teknoloji ve Turkcell'de bulut platformları ve OpenShift altyapısı üzerine çalıştı. Freya'da bankalardaki kurum içi platformu, izole ağları ve GPU üzerinde çalışan modellerin altyapısını yönetiyor.", "img": "photos/team/serkan.jpg", "li": "https://www.linkedin.com/in/serkan-%C3%B6zmen-9b68b9174/"}, {"n": "Ömer Yentur", "t": "AI/ML Engineer", "ab": "Kron'da makine öğrenmesi mühendisi olarak çalıştı, TÜBİTAK RUTE ve MARS Otonom Araçlar'da staj yaptı. Freya'da ses modeli araştırmaları yapıyor ve arXiv'de yayımlanan FreyaTTS araştırmasının yazarlarından.", "img": "photos/team/omer.jpg", "li": "https://www.linkedin.com/in/yentur/"}, {"n": "Ahmet Erdem Pamuk", "t": "AI/ML Engineer", "ab": "MotionShark'ta çok ajanlı sistemler üzerine araştırma mühendisi olarak çalıştı, UMRAM'da video generation ve dünya modelleri üzerine araştırma yapıyor. Freya'da Design Arena'da birinci olan ses modelini ve ilk açık ağırlıklı Türkçe TTS modeli FreyaTTS-small'u geliştirdi.", "img": "photos/team/ahmet.jpg", "li": "https://www.linkedin.com/in/ahmet-pamuk/"}];
+TOPICS.filter(t=>t.tl==="Ekibimiz").forEach(renderTopic);
+frames.push(`<section class="frame pad team"><div class="team-grid">${TEAM.map((m,i)=>`<article class="tm"><div class="ph"><img src="${m.img}" alt="${esc(m.n)}" loading="lazy"></div><div class="meta"><div class="nm">${esc(m.n)}</div><div class="ttl" lang="en">${esc(m.t)}</div><div class="row"><button type="button" class="ab">Hakkında →</button>${m.li?`<a class="li" href="${m.li}" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>`:""}</div></div><div class="ov"><p>${esc(m.ab)}</p><button type="button" class="ab x">← Kapat</button></div></article>`).join("")}</div></section>`);
+frames.push(`<section class="frame pad end">
+  <p class="eyebrow" style="margin:0">Devamı gelecek</p>
+  <span class="slab welcome">ARAMIZA<br>HOŞ GELDİN</span>
+  <p class="fine"><b>Kurum içi / Gizli.</b> Bu materyal yalnızca Freya ekibine yeni katılanlar için hazırlanmıştır ve yalnızca paylaşıldığı kişi tarafından görüntülenebilir. İçeriğin tamamının ya da bir bölümünün kopyalanması, çoğaltılması, ekran görüntüsünün alınması, iletilmesi veya üçüncü kişilerle paylaşılması yasaktır. © 2026 Freya. Tüm hakları saklıdır.</p>
+</section>`);
+
+const strip=document.getElementById("strip");
+strip.innerHTML=frames.join("");
+strip.addEventListener("click",e=>{const b=e.target.closest(".tm button.ab");if(b){e.stopPropagation();e.preventDefault();b.closest(".tm").classList.toggle("open")}else if(e.target.closest(".tm a.li")){e.stopPropagation()}},true);
+const frameEls=[...strip.children];
+const smooth=()=>matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";
+
+/* ---------- TOPIC TIMELINE (vertical page) ---------- */
+const monthSecs=frameEls.filter(f=>f.dataset.tl);
+const frameTop=f=>f.getBoundingClientRect().top+scrollY;
+const go=y=>scrollTo({top:y,behavior:smooth()});
+const step=dir=>{
+  const y=scrollY,tops=frameEls.map(frameTop);
+  if(dir>0){const n=tops.find(t=>t>y+4);go(Math.min(n??document.body.scrollHeight,y+innerHeight*0.85))}
+  else{const p=[...tops].reverse().find(t=>t<y-4);go(Math.max(p??0,y-innerHeight*0.85))}
+};
+document.getElementById("next").onclick=()=>step(1);
+document.getElementById("prev").onclick=()=>step(-1);
+const monthsEl=document.getElementById("months"),fill=document.getElementById("fill");
+monthsEl.innerHTML=monthSecs.map((f,i)=>`<li><button type="button" data-i="${i}" title="${f.dataset.tl}">${f.dataset.tl}</button></li>`).join("");
+const mBtns=[...monthsEl.querySelectorAll("button")];
+mBtns.forEach(b=>b.onclick=()=>go(frameTop(monthSecs[+b.dataset.i])));
+function sync(){
+  const probe=scrollY+innerHeight*0.35;
+  let cur=-1;monthSecs.forEach((f,i)=>{if(frameTop(f)<=probe)cur=i});
+  mBtns.forEach((b,i)=>{b.classList.toggle("on",i===cur);b.classList.toggle("past",i<cur);b.toggleAttribute("aria-current",i===cur)});
+  if(cur<0){fill.style.width="0"}
+  else{const ol=monthsEl.getBoundingClientRect(),b=mBtns[cur].getBoundingClientRect();fill.style.width=(b.left+b.width/2-ol.left)+"px"}
+}
+addEventListener("scroll",sync,{passive:true});
+addEventListener("resize",sync);
+sync();
+</script>
+
+</body>
+</html>
