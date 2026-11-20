@@ -265,6 +265,7 @@ a{color:inherit}
 .end .fine{margin-top:0!important}
 .end .welcome-line{margin:0;font-family:var(--f-display);font-size:clamp(2rem,5vh,2.8rem);line-height:1;color:var(--accent)}
 .card .src{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pic-link{display:contents;cursor:pointer}
 .tm{grid-row:auto!important;grid-column:auto!important}
 .wall-groups{flex-direction:column;gap:28px}
 .wg .wall{flex:none}
@@ -359,7 +360,7 @@ const TOPICS=[
    {d:"2026-07-10",who:"Garanti BBVA Partners",t:"Garanti BBVA Partners Tech 10. dönemine seçilen 5 girişimden biri, dönemin 1 numarası",m:"#1",src:"garantibbva.com.tr · webrazzi · "+IU+" Haz 2026"}]},stories:[]},
  {tl:"Eylül",eyebrow:"2026",title:"Eylül",dark:true,lead:{cap:{when:"Eylül 2026 · Design Arena",title:"Dünyanın en insansı sesi"}},stories:[
   {d:"2026-09-01",cards:[],photos:[
-   {img:"photos/design-arena.png",bare:true,white:true,title:"Design Arena Audio Realism Bench"}]},
+   {img:"photos/design-arena.png",bare:true,white:true,title:"Design Arena Audio Realism Bench",href:"https://www.designarena.ai/leaderboard?tab=audio"}]},
   {d:"2026-09-15",cards:[],
    photos:[
    {img:"photos/hackzone-ekip.jpg",overlay:true,when:"15 Eylül 2026 · Hackzone by Allianz",credit:"Fotoğraf: Freya"},
@@ -436,7 +437,7 @@ const capInner=p=>`<span class="when">${L(p.when||"")}</span>
       ${p.names?`<span class="names">${esc(p.names)}</span>`:""}
       ${p.names2?`<span class="names">${esc(p.names2)}</span>`:""}
       ${p.credit?`<span class="credit">${esc(p.credit)}</span>`:""}`;
-const picHtml=p=>`<div class="pic"><img src="${p.img}" alt="${esc(p.title||p.when||"")}" loading="lazy"></div>`;
+const picHtml=p=>{const im=`<img src="${p.img}" alt="${esc(p.title||p.when||"")}" loading="lazy">`;return `<div class="pic">${p.href?`<a class="pic-link" href="${p.href}" target="_blank" rel="noopener">${im}</a>`:im}</div>`};
 // a later photo of the same story: picture with its caption beside it, or the picture alone
 const ovCap=p=>`<div class="gcap ovcap"><span class="when">${L(p.when||"")}</span>${p.title&&!p.bare?`<b class="ovt">${esc(p.title)}</b>`:""}${p.text?`<span>${esc(p.text)}</span>`:""}${p.credit?`<span class="credit">${esc(p.credit)}</span>`:""}</div>`;
 const photoFrame=p=>p.whole
@@ -531,7 +532,7 @@ frames.push(`<section class="frame pad end">
 
 const strip=document.getElementById("strip");
 strip.innerHTML=frames.join("");
-strip.addEventListener("click",e=>{const b=e.target.closest(".tm button.ab");if(b){e.stopPropagation();e.preventDefault();b.closest(".tm").classList.toggle("open")}else if(e.target.closest(".tm a.li")){e.stopPropagation()}},true);
+strip.addEventListener("click",e=>{const b=e.target.closest(".tm button.ab");if(b){e.stopPropagation();e.preventDefault();b.closest(".tm").classList.toggle("open")}else if(e.target.closest("a[href]")){e.stopPropagation()}},true);
 const frameEls=[...strip.children];
 const smooth=()=>matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";
 
